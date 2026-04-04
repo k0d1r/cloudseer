@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Cluster {
+  id              Int         @id @default(autoincrement())
+  cluster_name    String      @unique
+  nodes           Int
+  total_cost      Float
+  efficiency_score Int
+  status          String
+  namespaces      Namespace[]
+}
+
+model Namespace {
+  id            Int     @id @default(autoincrement())
+  name          String
+  cpu           String
+  memory        String
+  cost          Float
+  trend         String
+  trend_percent Float
+  cluster       Cluster @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  clusterId     Int
+}
+
+model Forecast {
+  id           Int      @id @default(autoincrement())
+  model_name   String
+  confidence   Int
+  mape         Float
+  rmse         Float
+  trajectories Trajectory[]
+}
+
+model Trajectory {
+  id           Int      @id @default(autoincrement())
+  month        String
+  value        Float
+  is_predicted Boolean
+  forecast     Forecast @relation(fields: [forecastId], references: [id], onDelete: Cascade)
+  forecastId   Int
+}
